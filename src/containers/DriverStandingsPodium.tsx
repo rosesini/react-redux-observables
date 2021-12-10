@@ -1,4 +1,8 @@
+import { useEffect } from 'react'
 import { Podium, PodiumDriver, PodiumItem, PodiumLink, PodiumRank, PodiumRight, PodiumSubdetail, PodiumTime, TeamColorIcon } from '../components/StandingStyles'
+import { selectDriverStandings } from '../redux/driverStandings/reducer'
+import { loadDriverStandings } from '../redux/driverStandings/utils'
+import { useAppDispatch, useAppSelector } from '../redux/hooks'
 import { RANDOM_TEAM_COLORS } from '../utils'
 
 type DriverStandingsPodiumProps = {
@@ -6,7 +10,16 @@ type DriverStandingsPodiumProps = {
 }
 
 const DriverStandingsPodium: React.FC<DriverStandingsPodiumProps> = ({ season }) => {
-  const standings: any[] = []
+  const dispatch = useAppDispatch()
+  const { status, standings } = useAppSelector(state => selectDriverStandings(state, season))
+
+  useEffect(() => {
+    loadDriverStandings(season, dispatch)
+  }, [season, dispatch])
+
+  if (status === 'loading') {
+    return <p>Loading...</p>
+  }
 
   return (
     <Podium>
